@@ -1,0 +1,29 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --main-bg-color: #fafafa;
+  --main-txt-color: #0f172a;
+  --main-btn-color: #1d4ed8;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--main-bg-color);
+  font-family: "Space Grotesk";
+  color: var(--main-txt-color);
+}
+
+button {
+  background-color: var(--main-btn-color);
+  color: white;
+  font-size: 15px;
+  font-weight: 500;
+}
