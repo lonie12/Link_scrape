@@ -1,7 +1,7 @@
 export interface User {
-  userName?: string;
-  userTitle?: string;
+  p_uname?: string;
+  p_title?: string;
   nbFollowers?: string;
   nbFollowing?: string;
-  email?: string;
+  p_email?: string;
 }

@@ -4,12 +4,13 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"tsc -b && vite build --watch\" \"vite \" ",
-    "build": "tsc -b && vite build",
+    "dev": "concurrently \"tsc -b && vite build --watch && node prebuild.cjs\" \"vite \" ",
+    "build": "tsc -b && vite build && node prebuild.cjs",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "axios": "^1.7.7",
     "iconsax-react": "^0.0.8",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
