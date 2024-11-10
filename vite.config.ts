@@ -9,7 +9,8 @@ export default defineConfig({
       input: {
         main: "./index.html",
         // popup: "src/popup/popup.main.ts",
-        content: "src/content/content.main.ts",
+        content: "src/content/content.script.tsx",
+        contentMain: "src/content/content.main.tsx",
         // background: "src/worker/worker.main.ts",
       },
       output: {
@@ -20,5 +21,9 @@ export default defineConfig({
       },
     },
     outDir: "dist",
+    minify: false,
+    sourcemap: true,
+    chunkSizeWarningLimit: 1000,
+    // manifest: "vite-manifest.json",
   },
 });
