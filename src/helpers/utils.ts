@@ -1,4 +1,4 @@
-import { User } from "../models/user";
+import { User } from "../models/propspect";
 
 export const downloadJsonFile = (data: User) => {
   const jsonData = JSON.stringify(data, null, 2);
