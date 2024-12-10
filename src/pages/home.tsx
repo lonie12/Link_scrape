@@ -1,17 +1,18 @@
 import { useEffect, useState } from "react";
-import { ExportSquare, Logout } from "iconsax-react";
+import { ExportSquare, Login, Logout } from "iconsax-react";
 import { User } from "../models/propspect";
 import { UserDetailRow } from "../components/user-details";
-import ExtIconsax from "../helpers/icons";
+import ExtIconsax from "../lib/icons";
 import axios from "axios";
-// import { downloadJsonFile } from "../helpers/utils";
+import { apiUrl, appUrl } from "../lib/env";
+import { useNavigate } from "react-router-dom";
+import { useToaster } from "../context/toastContext";
 
 export default function HomePage() {
+  const navigate = useNavigate();
+  const { showToaster } = useToaster();
   const [profileData, setProfileData] = useState<User | undefined>(undefined);
   const [userData, setUserData] = useState<Session | undefined>(undefined);
-  const [message, setMessage] = useState<
-    { title: string; message: string; error?: boolean } | undefined
-  >();
 
   useEffect(() => {
     if (chrome) {
@@ -25,24 +26,17 @@ export default function HomePage() {
     }
   }, []);
 
-  useEffect(() => {
-    if (message) {
-      const timer = setTimeout(() => {
-        setMessage(undefined);
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [message]);
-
   const checkUserLogin = async () => {
     const result = await chrome.storage.sync.get("auth");
-    setUserData(result.auth.userData);
+    setUserData(result.auth?.userData);
   };
 
-  const handleMessage = (message: [User, string]) => {
-    if (message) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleMessage = (message: any) => {
+    if (message && Object.prototype.hasOwnProperty.call(message, "auth")) {
+      setUserData(message.auth.userData);
+    } else {
       const data = { ...message[0], p_email: message[1] };
-      console.log(data, "Scraped data");
       setProfileData(data);
     }
   };
@@ -55,26 +49,23 @@ export default function HomePage() {
   };
 
   const handleDownload = async () => {
-    try {
-      axios.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${userData?.accessToken}`;
-      const result = await axios.post("http://localhost:5000/api/prospect", {
-        ...profileData,
-      });
-      if (result && result.status == 201) {
-        return setMessage({
-          title: "Success",
-          message: "Data uploaded successfuly",
+    if (!userData) {
+      return showToaster("Log in to send data to your dashboard.");
+    } else {
+      try {
+        axios.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${userData?.accessToken}`;
+        const result = await axios.post(`${apiUrl}/prospect`, {
+          ...profileData,
         });
+        if (result && result.status == 201) {
+          return showToaster("Data uploaded successfuly.", "success");
+        }
+      } catch (e) {
+        console.error(e);
+        return showToaster("Server error try again later !!!");
       }
-    } catch (err) {
-      console.error(err);
-      setMessage({
-        title: "Error",
-        message: "Please try again !!!",
-        error: true,
-      });
     }
   };
 
@@ -82,23 +73,38 @@ export default function HomePage() {
     chrome.storage.sync.set({
       auth: { loggedIn: false, userData: undefined },
     });
+    navigate("/", { replace: true });
   };
 
   return (
     <div className="relative">
-      <button
-        style={{ backgroundColor: "#dc2626", padding: 4, borderRadius: "50%" }}
-        className="absolute right-2"
-        onClick={handleLogout}
-      >
-        <Logout />
-      </button>
+      {userData ? (
+        <div className="absolute right-2 flex items-center gap-2">
+          {!userData && <span className="font-medium">Logout</span>}
+          <button
+            className={`bg-[#dc2626] p-1 rounded-full`}
+            onClick={handleLogout}
+          >
+            {userData ? <Logout /> : <Login />}
+          </button>
+        </div>
+      ) : (
+        <div className="absolute right-2 flex items-center gap-2">
+          {!userData && <span className="font-medium">Login</span>}
+          <button
+            className={`bg-blue-600 p-1 rounded-full`}
+            onClick={() => navigate("/login")}
+          >
+            {userData ? <Logout /> : <Login />}
+          </button>
+        </div>
+      )}
       <div className="mb-4">
         <div className="flex items-center space-x-3">
           <img className="size-9" src="../assets/logo.png" alt="" />
           <div className="flex flex-col items-start">
             <h2 className="text-xl font-bold">Profile Scraping</h2>
-            {userData?.name}
+            {userData && `Logged as: ${userData?.name}`}
           </div>
         </div>
         <p className="text-[15px] text-gray-600 mt-2">
@@ -107,24 +113,11 @@ export default function HomePage() {
         <a
           className="flex gap-2 items-center text-[#1d4ed8]"
           target="_blank"
-          href="http://localhost:3000"
+          href={appUrl}
         >
           <span className="text-[15px] text-base">Open Dashboard</span>
           <ExportSquare size={16} />
         </a>
-
-        {message && (
-          <div
-            className={`flex items-center gap-2 my-2 border rounded-md p-3 ${
-              message?.error
-                ? "bg-[#fee2e2] text-[#dc2626] border-[#dc2626]"
-                : "bg-[#dcfce7] text-[#16a34a] border-[#16a34a]"
-            }`}
-          >
-            <h3 className="font-bold">{message?.title}:</h3>{" "}
-            <span>{message?.message}</span>
-          </div>
-        )}
       </div>
       {profileData && (
         <div className="flex flex-col gap-3">

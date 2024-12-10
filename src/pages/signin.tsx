@@ -1,51 +1,48 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import TextInput from "../components/text-input";
 import Button from "../components/button";
 import { Google } from "iconsax-react";
 import axios, { isAxiosError } from "axios";
+import { appUrl } from "../lib/env";
+import { useNavigate } from "react-router-dom";
+import SpinLoader from "../components/spin";
+import { useToaster } from "../context/toastContext";
 
 type InputChangeProp = React.ChangeEvent<HTMLInputElement>;
 
 export default function SignInPage() {
+  const navigate = useNavigate();
+  const { showToaster } = useToaster();
+  const [authenticating, setAuthenticating] = useState(false);
   const [loginData, setLoginData] = useState<{
     email: string;
     password: string;
   }>({ email: "", password: "" });
-  const [error, setError] = useState<string | undefined>();
-
-  useEffect(() => {
-    if (error) {
-      const timer = setTimeout(() => {
-        setError(undefined);
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [error]);
 
   const handleLogin = async () => {
     try {
+      setAuthenticating(true);
       if (!loginData.email || !loginData.password) return;
 
-      const result = await axios.post("http://localhost:5000/api/auth/login", {
+      const result = await axios.post(`${appUrl}/auth/login`, {
         ...loginData,
       });
+
+      setAuthenticating(false);
       if (result.status == 200) {
         chrome.storage.sync.set({
           auth: { loggedIn: true, userData: result.data },
         });
+        showToaster("Successfully logged in.", "success");
+        navigate("/", { replace: true });
       }
     } catch (error) {
+      setAuthenticating(false);
       if (isAxiosError(error) && error.status == 401) {
-        return setError(error.response?.data.message);
+        return showToaster(error.response?.data.message);
       }
     }
   };
-
-  // chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
-  //   const tab = tabs[0];
-
-  //   chrome.tabs.sendMessage(tab.id!, { loggedIn: true });
-  // });
 
   const handleInputChange = (e: InputChangeProp) => {
     setLoginData({ ...loginData, [e.target.id]: e.target.value });
@@ -62,12 +59,6 @@ export default function SignInPage() {
           Use to scrape user data from their LinkedIn profile
         </p>
       </div>
-
-      {error && (
-        <div className="flex items-center gap-2 mb-2 border rounded-md p-3 bg-[#fee2e2] text-[#dc2626] border-[#dc2626]">
-          <h3 className="font-bold">Error:</h3> <span>{error}</span>
-        </div>
-      )}
 
       <h2 className="text-xl font-bold mb-2">Sign In</h2>
       <div className="flex gap-4 flex-col">
@@ -87,8 +78,11 @@ export default function SignInPage() {
           placeholder="********"
           onChange={handleInputChange}
         />
-        <Button onClick={handleLogin}>Login</Button>
-        <Button style={{ backgroundColor: "rgb(64 64 64)" }}>
+        <Button onClick={handleLogin}>
+          {authenticating && <SpinLoader />}
+          Login
+        </Button>
+        <Button style={{ backgroundColor: "#1E1E1E" }}>
           <Google size={18} />
           <span>Continue with Google</span>
         </Button>
@@ -96,7 +90,7 @@ export default function SignInPage() {
         <a
           className="self-center"
           target="_blank"
-          href="http://localhost:3000/auth/signup"
+          href={`${appUrl}/auth/signup`}
         >
           <span className="text-[15px] text-base">
             Don't have Account ? <span className="text-[#1d4ed8]">Sing Up</span>

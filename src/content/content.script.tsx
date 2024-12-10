@@ -128,6 +128,7 @@ chrome.runtime.onMessage.addListener(async (request) => {
 });
 
 chrome.storage.onChanged.addListener((changes, area: string) => {
+  console.log(changes);
   if (area === "sync") {
     chrome.runtime.sendMessage({
       auth: changes.auth.newValue,

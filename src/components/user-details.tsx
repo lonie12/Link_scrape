@@ -1,4 +1,4 @@
-import iconsax from "../helpers/icons";
+import iconsax from "../lib/icons";
 
 interface UserDetailRowProps {
   ikey: string;

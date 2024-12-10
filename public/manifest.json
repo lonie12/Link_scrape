@@ -7,7 +7,7 @@
     "default_popup": "index.html"
   },
 
-  "permissions": ["scripting", "activeTab", "storage"],
+  "permissions": ["storage"],
 
   "icons": {
     "16": "icons/icon16.png",
@@ -16,6 +16,8 @@
     "128": "icons/icon128.png"
   },
 
+  "host_permissions": ["https://www.linkedin.com/*"],
+
   "content_scripts": [
     {
       "matches": ["https://www.linkedin.com/*"],
@@ -23,12 +25,10 @@
     }
   ],
 
-  "host_permissions": ["https://www.linkedin.com/*"],
-
   "web_accessible_resources": [
     {
       "resources": ["assets/logo.png"],
-      "matches": ["<all_urls>"]
+      "matches": ["https://www.linkedin.com/*"]
     }
   ]
 }

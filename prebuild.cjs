@@ -23,4 +23,4 @@ chromeManifest.web_accessible_resources = [
 
 // Écrire le manifest mis à jour
 fs.writeFileSync(chromeManifestPath, JSON.stringify(chromeManifest, null, 2));
-console.log("Updated manifest.json with Vite assets");
+console.info("Updated manifest.json with Vite assets");

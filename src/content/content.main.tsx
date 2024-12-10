@@ -1,6 +1,5 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
-console.log("Content Main Script");
 
 ReactDOM.createRoot(document.getElementById("floatingLogo")!).render(
   <React.StrictMode>

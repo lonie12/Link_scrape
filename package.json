@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently \"tsc -b && vite build --watch && node prebuild.cjs\" \"vite \" ",
-    "build": "tsc -b && vite build && node prebuild.cjs",
+    "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -13,7 +13,8 @@
     "axios": "^1.7.7",
     "iconsax-react": "^0.0.8",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.0.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.11.1",
