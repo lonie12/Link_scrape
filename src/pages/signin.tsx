@@ -3,7 +3,7 @@ import TextInput from "../components/text-input";
 import Button from "../components/button";
 import { Google } from "iconsax-react";
 import axios, { isAxiosError } from "axios";
-import { appUrl } from "../lib/env";
+import { apiUrl, appUrl } from "../lib/env";
 import { useNavigate } from "react-router-dom";
 import SpinLoader from "../components/spin";
 import { useToaster } from "../context/toastContext";
@@ -24,7 +24,7 @@ export default function SignInPage() {
       setAuthenticating(true);
       if (!loginData.email || !loginData.password) return;
 
-      const result = await axios.post(`${appUrl}/auth/login`, {
+      const result = await axios.post(`${apiUrl}/auth/login`, {
         ...loginData,
       });
 
